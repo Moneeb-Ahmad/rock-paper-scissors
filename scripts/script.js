@@ -1,4 +1,14 @@
-console.log(game());
+/*console.log(game());*/
+const rock = document.querySelector('.rock');
+const paper = document.querySelector('.paper');
+const scissors = document.querySelector('.scissors');
+const resultsContainer = document.querySelector('.results');
+let gameOver = false;
+
+let playerScore = 0;
+let computerScore = 0;
+let roundNumber = 0;
+
 
 function computerPlay() {
   let randomNumber = Math.floor(Math.random() * 3) + 1;
@@ -77,43 +87,56 @@ function playRound(playerSelection, computerSelection = computerPlay()) {
 
 }
 
-function game() {
-  let playerScore = 0;
-  let computerScore = 0;
-  for (let i = 0; i < 5; i++) {
-    let prompt = window.prompt("Enter: Rock, Paper or Scissors: ");
-    let userChoice = prompt.toLowerCase();
-    let res = playRound(prompt);
-    let arr;
-    let computerChoice;
-    if (!res.includes("Check")) {
-      arr = res.split(",");
-      computerChoice = arr[1];
-    } else {
-      computerChoice = "";
-      userChoice = "";
-    }
-    if (res.includes("win")) {
-      playerScore++;
-      console.log("You win round " + i + " " + userChoice +
-        " beats " + computerChoice);
-    } else if (res.includes("lose")) {
-      console.log("You lose round " + i + " " + computerChoice +
-        " beats " + userChoice);
-      computerScore++;
-    } else if (res.includes("tie")) {
-      console.log("Tie no points awarded");
-    } else {
-      console.log("Someone messed up");
-    }
-    console.log("End of round " + i + " Your Score: " + playerScore +
-      " Computer Score: " + computerScore);
-  }
-  if (playerScore == computerScore) {
-    return "Tie";
-  } else if (playerScore > computerScore) {
-    return "You win!";
+function game(playerSelection) {
+  roundNumber++;
+  let prompt = playerSelection;
+  let userChoice = prompt.toLowerCase();
+  let res = playRound(prompt);
+  let arr;
+  let computerChoice;
+  if (!res.includes("Check")) {
+    arr = res.split(",");
+    computerChoice = arr[1];
   } else {
-    return "You lose :(";
+    computerChoice = "";
+    userChoice = "";
+  }
+  if (res.includes("win")) {
+    playerScore++;
+    resultsContainer.textContent = `You win round ${roundNumber}
+      ${userChoice} beats ${computerChoice}`;
+  } else if (res.includes("lose")) {
+    resultsContainer.textContent = `You lose round ${roundNumber}
+      ${computerChoice} beats ${userChoice}`;
+    computerScore++;
+  } else if (res.includes("tie")) {
+    resultsContainer.textContent = `Tie no points awarded`;
+  } else {
+    resultsContainer.textContent = `Someone messed up`;
+  }
+  resultsContainer.textContent += ` End of round ${roundNumber}
+    Your Score: ${playerScore} Computer Score: ${computerScore}`;
+  if (playerScore == 5) {
+    resultsContainer.textContent += " You won!";
+    gameOver = true;
+  } else if (computerScore == 5) {
+    resultsContainer.textContent += "You lost :(";
+    gameOver = true;
   }
 }
+
+function selection(e) {
+  if (playerScore < 5 && computerScore < 5) {
+    game(e.target.className.toString().toLowerCase());
+  } else {
+    if (gameOver) {
+      resultsContainer.textContent += ` Game Over Refresh the page
+        to play again!`;
+      gameOver = false;
+    }
+  }
+}
+
+rock.addEventListener('click', selection);
+paper.addEventListener('click', selection);
+scissors.addEventListener('click', selection);
